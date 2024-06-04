@@ -1,1 +1,1 @@
-python tools/train.py configs/body_2d_keypoint/rtmpose/coco/rtmpose-s_8xb256-420e_custom-256x256.py
+CUDA_VISIBLE_DEVICES=2 python tools/train.py configs/body_2d_keypoint/rtmpose/coco/rtmpose-m_8xb256-420e_custom-256x256.py --resume
