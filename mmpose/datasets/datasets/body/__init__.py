@@ -2,6 +2,7 @@
 from .aic_dataset import AicDataset
 from .coco_dataset import CocoDataset
 from .custom_dataset import CustomDataset
+from .custom_qrcode_dataset import CustomQrCodeDataset
 from .crowdpose_dataset import CrowdPoseDataset
 from .exlpose_dataset import ExlposeDataset
 from .humanart21_dataset import HumanArt21Dataset
@@ -15,7 +16,7 @@ from .posetrack18_dataset import PoseTrack18Dataset
 from .posetrack18_video_dataset import PoseTrack18VideoDataset
 
 __all__ = [
-    'CocoDataset', 'CustomDataset', 'MpiiDataset', 'MpiiTrbDataset', 'AicDataset',
+    'CocoDataset', 'CustomDataset','CustomQrCodeDataset', 'MpiiDataset', 'MpiiTrbDataset', 'AicDataset',
     'CrowdPoseDataset', 'OCHumanDataset', 'MhpDataset', 'PoseTrack18Dataset',
     'JhmdbDataset', 'PoseTrack18VideoDataset', 'HumanArtDataset',
     'HumanArt21Dataset', 'ExlposeDataset'

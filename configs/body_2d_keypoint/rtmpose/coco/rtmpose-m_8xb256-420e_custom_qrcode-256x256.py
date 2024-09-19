@@ -1,8 +1,8 @@
-_base_ = ['../../../_base_/default_runtime_no_val.py',
-          '../../../_base_/datasets/custom.py']
+_base_ = ['../../../_base_/default_runtime.py',
+          '../../../_base_/datasets/custom_qrcode.py']
 
 # runtime
-max_epochs = 1000
+max_epochs = 420
 stage2_num_epochs = 30
 base_lr = 4e-3
 
@@ -60,8 +60,8 @@ model = dict(
         type='CSPNeXt',
         arch='P5',
         expand_ratio=0.5,
-        deepen_factor=1.,
-        widen_factor=1.,
+        deepen_factor=0.67,
+        widen_factor=0.75,
         out_indices=(4, ),
         channel_attention=True,
         norm_cfg=dict(type='SyncBN'),
@@ -70,12 +70,12 @@ model = dict(
             type='Pretrained',
             prefix='backbone.',
             checkpoint='https://download.openmmlab.com/mmpose/v1/projects/'
-            'rtmposev1/cspnext-l_udp-aic-coco_210e-256x192-273b7631_20230130.pth'  # noqa
+            'rtmposev1/cspnext-m_udp-aic-coco_210e-256x192-f2f7d6f6_20230130.pth'  # noqa
         )),
     head=dict(
         type='RTMCCHead',
-        in_channels=1024,
-        out_channels=6,
+        in_channels=768,
+        out_channels=4,
         input_size=codec['input_size'],
         in_featuremap_size=tuple([s // 32 for s in codec['input_size']]),
         simcc_split_ratio=codec['simcc_split_ratio'],
@@ -98,9 +98,9 @@ model = dict(
     test_cfg=dict(flip_test=True))
 
 # base dataset settings
-dataset_type = 'CustomDataset'
+dataset_type = 'CustomQrCodeDataset'
 data_mode = 'topdown'
-data_root = '/home/ipfs10/workspace/pycode/501_total/dataset/one_pointer_coco'
+data_root = '/home/ipfs10/workspace/pycode/7seg-image-generator/sim_qrcode_yolo/'
 
 backend_args = dict(backend='local')
 # backend_args = dict(
@@ -178,7 +178,7 @@ train_pipeline_stage2 = [
 
 # data loaders
 train_dataloader = dict(
-    batch_size=64,
+    batch_size=128,
     num_workers=10,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
@@ -186,28 +186,28 @@ train_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file='annotations/person_keypoints_train.json',
+        ann_file='annotations/coco_annotations.json',
         data_prefix=dict(img='train2017/'),
         pipeline=train_pipeline,
     ))
-# val_dataloader = dict(
-#     batch_size=64,
-#     num_workers=10,
-#     persistent_workers=True,
-#     drop_last=False,
-#     sampler=dict(type='DefaultSampler', shuffle=False, round_up=False),
-#     dataset=dict(
-#         type=dataset_type,
-#         data_root=data_root,
-#         data_mode=data_mode,
-#         ann_file='annotations/person_keypoints_train.json',
-#         # bbox_file=f'{data_root}person_detection_results/'
-#         # 'COCO_val2017_detections_AP_H_56_person.json',
-#         data_prefix=dict(img='train2017/'),
-#         test_mode=True,
-#         pipeline=val_pipeline,
-#     ))
-val_dataloader = None
+val_dataloader = dict(
+    batch_size=128,
+    num_workers=10,
+    persistent_workers=True,
+    drop_last=False,
+    sampler=dict(type='DefaultSampler', shuffle=False, round_up=False),
+    dataset=dict(
+        type=dataset_type,
+        data_root=data_root,
+        data_mode=data_mode,
+        ann_file='annotations/coco_annotations_val.json',
+        # bbox_file=f'{data_root}person_detection_results/'
+        # 'COCO_val2017_detections_AP_H_56_person.json',
+        data_prefix=dict(img='val2017/'),
+        test_mode=True,
+        pipeline=val_pipeline,
+    ))
+# val_dataloader = None
 test_dataloader = val_dataloader
 
 # hooks
@@ -228,8 +228,8 @@ custom_hooks = [
 ]
 
 # evaluators
-# val_evaluator = dict(
-#     type='CocoMetric',
-#     ann_file=data_root + 'annotations/person_keypoints_train.json')
-val_evaluator = None
+val_evaluator = dict(
+    type='CocoMetric',
+    ann_file=data_root + 'annotations/coco_annotations_val.json')
+# val_evaluator = None
 test_evaluator = val_evaluator
